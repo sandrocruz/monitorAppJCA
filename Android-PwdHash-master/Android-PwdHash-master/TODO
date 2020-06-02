@@ -1,0 +1,4 @@
+* Copy to clipboard and open browser
+* Allow cleartext password field
+* Better notify user about empty input (flash/animate the TextEdit)
+* Place Password Hash in notification area for quick access

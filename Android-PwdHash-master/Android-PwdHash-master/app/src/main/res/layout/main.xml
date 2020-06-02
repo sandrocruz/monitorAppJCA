@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/MainWindow"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layoutDirection="locale"
+    android:textDirection="locale">
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="vertical">
+	
+	    <TextView
+	        style="@style/Label"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="@string/siteAddress" />
+	
+	    <AutoCompleteTextView
+	        android:id="@+id/siteAddress"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:hint="@string/siteAddressHint"
+	        android:inputType="textUri|textNoSuggestions"
+	        android:imeOptions="actionNext" />
+	
+	    <TextView
+	        style="@style/Label"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="@string/password" />
+	
+	    <EditText
+	        android:id="@+id/password"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:inputType="textPassword"
+			android:importantForAccessibility="no"
+			android:imeOptions="actionDone|flagNoPersonalizedLearning"/>
+	
+	    <LinearLayout
+	        style="@style/Label"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal" >
+	
+	        <TextView
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:paddingRight="@dimen/minorPadding"
+	            android:paddingEnd="@dimen/minorPadding"
+	            android:text="@string/hashedPassword" />
+	
+	        <TextView
+	            android:id="@+id/hashedPassword"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:typeface="monospace"
+	            android:textIsSelectable="false" />
+	    </LinearLayout>
+	
+	    <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal"
+	        android:paddingTop="@dimen/minorPadding" >
+	
+	        <Button
+	            android:id="@+id/copyBtn"
+	            android:layout_width="0dip"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="1"
+	            android:enabled="false"
+	            android:text="@string/copyBtn" />
+	    </LinearLayout>
+	
+	</LinearLayout>
+</ScrollView>
