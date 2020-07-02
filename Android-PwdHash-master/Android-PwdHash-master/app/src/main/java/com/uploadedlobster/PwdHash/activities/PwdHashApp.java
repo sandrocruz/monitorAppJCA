@@ -33,19 +33,15 @@
 
 package com.uploadedlobster.PwdHash.activities;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.stream.*;
-import android.Manifest;
-import android.app.Activity;
+
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter.CursorToStringConverter;
 import android.text.Editable;
@@ -74,6 +70,11 @@ import org.bouncycastle.Monitor;
 import java.security.Provider;
 import java.security.Security;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import java.text.DecimalFormat;
+import android.Manifest;
+import android.app.Activity;
+import android.support.v4.app.ActivityCompat;
+import android.os.Build;
 
 
 /**
@@ -92,8 +93,6 @@ public class PwdHashApp extends Activity {
 	private Button mCopyBtn;
 	private String[] tempos;
 	private float sum;
-	//private String[] memoria;
-
 
 	private boolean mSaveStateOnExit = true;
 
@@ -191,8 +190,6 @@ public class PwdHashApp extends Activity {
 		}
 
 		setupBouncyCastle();
-		Monitor.writeTimes("", "CLEAN");
-		//Monitor.writeMemory("", 0);
 	}
 
 	@Override
@@ -213,10 +210,15 @@ public class PwdHashApp extends Activity {
 		sum = Monitor.writeTimes("", "SUM");
 		//memoria = Monitor.writeMemory("", 1);
 
-		sum = sum/1000000;
-		DecimalFormat df = new DecimalFormat("#.####");
-		String iString = df.format(sum);
-		System.out.println("Tempo de execução: "+iString+" ms\n");
+        if (sum > 15000000) {
+            System.out.println("Tempo de execução: O sistema preparou a build...");
+        }
+        else {
+        sum = sum/1000000;
+        DecimalFormat df = new DecimalFormat("#.####");
+        String iString = df.format(sum);
+        System.out.println("Tempo de execução: " + iString + " ms\n");
+        }
 
 		/*
 		for (String elem : memoria) {
