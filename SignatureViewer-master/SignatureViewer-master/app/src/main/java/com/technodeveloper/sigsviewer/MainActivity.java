@@ -55,6 +55,8 @@ public class MainActivity extends Activity {
 
     private String[] tempos;
     private float sum;
+    private long startMemory;
+    private long endMemory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,34 +77,32 @@ public class MainActivity extends Activity {
         }
 
         setupBouncyCastle();
-        //Monitor.writeMemory("", 0);
+        startMemory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        long statusMemory;
         sum = Monitor.writeTimes("", "SUM");
-        //memoria = Monitor.writeMemory("", 1);
+        endMemory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+        statusMemory = endMemory - startMemory;
+
         if (sum > 15000000) {
-            System.out.println("Tempo de execução: O sistema preparou a build...");
+            System.out.println("[M] Tempo de execução: O sistema preparou a build...");
         }
         else {
         sum = sum/1000000;
+        statusMemory = statusMemory/1000;
         DecimalFormat df = new DecimalFormat("#.####");
+        DecimalFormat df2 = new DecimalFormat("#.####");
         String iString = df.format(sum);
-        System.out.println("Tempo de execução: " + iString + " ms\n");
+        String iString2 = df2.format(statusMemory);
+        System.out.println("[M] Tempo de execução: " + iString + " ms\n");
+        System.out.println("[M] Memória: " + iString2 + " KB\n");
         }
-        /*
-        for (String elem : memoria) {
-            if (elem != null && elem != "") {
-            System.out.println("Memórias: " + elem + "\n");
-            }
-        }
-        */
+
         Monitor.writeTimes("", "CLEAN");
-        //Monitor.writeMemory("", 0);
-
-
     }
 
     private boolean mSaveStateOnExit = true;

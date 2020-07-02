@@ -217,7 +217,7 @@ public class PwdHashApp extends Activity {
      
 
         if (sum > 15000000) {
-            System.out.println("Tempo de execução: O sistema preparou a build...");
+            System.out.println("[M] Tempo de execução: O sistema preparou a build...");
         }
         else {
         sum = sum/1000000;
@@ -231,8 +231,6 @@ public class PwdHashApp extends Activity {
         }
 
 		Monitor.writeTimes("", "CLEAN");
-
-
 	}
 
 	private void setWindowGeometry() {
