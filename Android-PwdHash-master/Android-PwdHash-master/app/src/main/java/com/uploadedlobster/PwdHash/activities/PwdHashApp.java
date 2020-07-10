@@ -65,7 +65,6 @@ import com.uploadedlobster.PwdHash.storage.HistoryDataSource;
 import com.uploadedlobster.PwdHash.storage.HistoryOpenHelper;
 import com.uploadedlobster.PwdHash.storage.UpdateHistoryTask;
 import com.uploadedlobster.PwdHash.util.Preferences;
-import com.uploadedlobster.PwdHash.activities.monitor;
 import org.bouncycastle.Monitor;
 import java.security.Provider;
 import java.security.Security;
@@ -155,7 +154,34 @@ public class PwdHashApp extends Activity {
         // of that it's possible to have another BC implementation loaded in VM.
         Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
         Security.insertProviderAt(new BouncyCastleProvider(), 1);
+
     }
+
+    @Override
+	protected void onDestroy() {
+		super.onDestroy();
+		long statusMemory;
+		sum = Monitor.writeTimes("", "SUM");
+		endMemory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+        statusMemory = endMemory - startMemory;
+     
+
+        if (sum > 15000000) {
+            System.out.println("[M] Tempo de execução: O sistema preparou a build...");
+        }
+        else {
+        sum = sum/1000000;
+        statusMemory = statusMemory/1000;
+        DecimalFormat df = new DecimalFormat("#.####");
+        DecimalFormat df2 = new DecimalFormat("#.####");
+        String iString = df.format(sum);
+        String iString2 = df2.format(statusMemory);
+        System.out.println("[M] Tempo de execução: " + iString + " ms\n");
+        System.out.println("[M] Memória: " + iString2 + " KB\n");
+        }
+
+		Monitor.writeTimes("", "CLEAN");
+	}
 
 	/** Called when the activity is first created. */
 	@Override
@@ -207,31 +233,6 @@ public class PwdHashApp extends Activity {
 		}
 	}
 
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		long statusMemory;
-		sum = Monitor.writeTimes("", "SUM");
-		endMemory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-        statusMemory = endMemory - startMemory;
-     
-
-        if (sum > 15000000) {
-            System.out.println("[M] Tempo de execução: O sistema preparou a build...");
-        }
-        else {
-        sum = sum/1000000;
-        statusMemory = statusMemory/1000;
-        DecimalFormat df = new DecimalFormat("#.####");
-        DecimalFormat df2 = new DecimalFormat("#.####");
-        String iString = df.format(sum);
-        String iString2 = df2.format(statusMemory);
-        System.out.println("[M] Tempo de execução: " + iString + " ms\n");
-        System.out.println("[M] Memória: " + iString2 + " KB\n");
-        }
-
-		Monitor.writeTimes("", "CLEAN");
-	}
 
 	private void setWindowGeometry() {
 		Window window = getWindow();
