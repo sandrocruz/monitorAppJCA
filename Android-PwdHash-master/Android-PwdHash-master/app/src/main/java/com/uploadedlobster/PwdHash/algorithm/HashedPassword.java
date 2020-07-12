@@ -48,7 +48,6 @@ import java.util.regex.Pattern;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import com.uploadedlobster.PwdHash.activities.monitor;
 
 
 

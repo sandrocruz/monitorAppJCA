@@ -171,7 +171,7 @@ public class PwdHashApp extends Activity {
         }
         else {
         sum = sum/1000000;
-        statusMemory = statusMemory/1000;
+			statusMemory = Math.abs(statusMemory/1000);
         DecimalFormat df = new DecimalFormat("#.####");
         DecimalFormat df2 = new DecimalFormat("#.####");
         String iString = df.format(sum);
