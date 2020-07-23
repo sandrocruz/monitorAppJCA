@@ -72,24 +72,29 @@ CODE = """        public void requestPermissionForReadExternalStorage() throws E
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        long statusMemory;
+        float statusMemory;
+        float statusAppTime;
         sum = Monitor.writeTimes("", "SUM");
-        endMemory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
         statusMemory = endMemory - startMemory;
+        statusAppTime = endAppTime - startAppTime;
          
 
         if (sum > 15000000) {
-            System.out.println("[M] Tempo de execução: O sistema preparou a build...");
+            System.out.println("[Monitor] Tempo de execução: O sistema preparou a build...");
         }
         else {
         sum = sum/1000000;
+        statusAppTime = statusAppTime/1000000;
         statusMemory = Math.abs(statusMemory/1000);
         DecimalFormat df = new DecimalFormat("#.####");
         DecimalFormat df2 = new DecimalFormat("#.####");
+        DecimalFormat df3 = new DecimalFormat("#.####");
         String iString = df.format(sum);
         String iString2 = df2.format(statusMemory);
-        System.out.println("[M] Tempo de execução: " + iString + " ms\\n");
-        System.out.println("[M] Memória: " + iString2 + " KB\\n");
+        String iString3 = df3.format(statusAppTime);
+        System.out.println("[Monitor] Tempo de execução (Total): " + iString3 + " ms\\n");
+        System.out.println("[Monitor] Tempo de execução (Segurança): " + iString + " ms\\n");
+        System.out.println("[Monitor] Memória: " + iString2 + " KB\\n");
         }
 
         Monitor.writeTimes("", "CLEAN");
@@ -98,7 +103,7 @@ CODE = """        public void requestPermissionForReadExternalStorage() throws E
 }
 """
 
-VARS = ["    private String[] tempos;", "    private float sum;", "    private long startMemory;", "    private long endMemory;", "    private boolean mSaveStateOnExit = true;",
+VARS = ["    private float sum;", "    private float startMemory;", "    private float endMemory;", "    private float startAppTime; ", "    private float endAppTime;" ,"    private boolean mSaveStateOnExit = true;", 
 "    private static final int WRITE_STORAGE_PERMISSION_REQUEST_CODE = 1;", "    private static final int READ_STORAGE_PERMISSION_REQUEST_CODE = 2;\n"]
 
 def copyLibJar(argv):
@@ -182,7 +187,7 @@ def findMainActivity(argv):
                     while (methods[i] != '}'):
                         i -= 1
                         
-                    newMethods = methods[:i] + "\n" + """        if (checkPermissionForWriteExternalStorage() == false || checkPermissionForReadExternalStorage() == false) {
+                    newMethods = "\n        startAppTime = System.nanoTime();\n        startMemory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();\n" + methods[:i] + "\n" + """        if (checkPermissionForWriteExternalStorage() == false || checkPermissionForReadExternalStorage() == false) {
             try {
                 requestPermissionForWriteExternalStorage();
                 requestPermissionForReadExternalStorage();
@@ -192,7 +197,8 @@ def findMainActivity(argv):
         }
 
         setupBouncyCastle();
-        startMemory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+        endMemory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+        endAppTime = System.nanoTime();
     }""" + "\n\n    "
 
 

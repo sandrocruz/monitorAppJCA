@@ -32,18 +32,28 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.time.Instant;
-import android.app.Activity;
 import org.bouncycastle.Monitor;
 import java.security.Provider;
 import java.security.Security;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import java.text.DecimalFormat;
 import android.Manifest;
+import android.app.Activity;
 import android.support.v4.app.ActivityCompat;
 import android.os.Build;
+import java.time.Instant;
 
 public class MainActivity extends Activity {
+
+    private float sum;
+    private float startMemory;
+    private float endMemory;
+    private float startAppTime; 
+    private float endAppTime;
+    private boolean mSaveStateOnExit = true;
+    private static final int WRITE_STORAGE_PERMISSION_REQUEST_CODE = 1;
+    private static final int READ_STORAGE_PERMISSION_REQUEST_CODE = 2;
+
 
     private ProgressBar appsLoadPb;
     private LinearLayout mainLay;
@@ -53,20 +63,18 @@ public class MainActivity extends Activity {
     private List<AppInfo> appInfos = new ArrayList<>();
     private AppsListAdapter adapter;
 
-    private String[] tempos;
-    private float sum;
-    private long startMemory;
-    private long endMemory;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        startAppTime = System.nanoTime();
+        startMemory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         loadViews();
         listAllApps();
         setListeners();
-
+    
         if (checkPermissionForWriteExternalStorage() == false || checkPermissionForReadExternalStorage() == false) {
             try {
                 requestPermissionForWriteExternalStorage();
@@ -77,93 +85,8 @@ public class MainActivity extends Activity {
         }
 
         setupBouncyCastle();
-        startMemory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        long statusMemory;
-        sum = Monitor.writeTimes("", "SUM");
         endMemory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-        statusMemory = endMemory - startMemory;
-
-        if (sum > 15000000) {
-            System.out.println("[M] Tempo de execução: O sistema preparou a build...");
-        }
-        else {
-        sum = sum/1000000;
-        statusMemory = Math.abs(statusMemory/1000);
-        DecimalFormat df = new DecimalFormat("#.####");
-        DecimalFormat df2 = new DecimalFormat("#.####");
-        String iString = df.format(sum);
-        String iString2 = df2.format(statusMemory);
-        System.out.println("[M] Tempo de execução: " + iString + " ms\n");
-        System.out.println("[M] Memória: " + iString2 + " KB\n");
-        }
-
-        Monitor.writeTimes("", "CLEAN");
-    }
-
-    private boolean mSaveStateOnExit = true;
-
-    private static final int WRITE_STORAGE_PERMISSION_REQUEST_CODE = 1;
-    private static final int READ_STORAGE_PERMISSION_REQUEST_CODE = 2;
-
-
-    public void requestPermissionForReadExternalStorage() throws Exception {
-        try {
-            ActivityCompat.requestPermissions((Activity) this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    READ_STORAGE_PERMISSION_REQUEST_CODE);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
-    }
-
-    public void requestPermissionForWriteExternalStorage() throws Exception {
-        try {
-            ActivityCompat.requestPermissions((Activity) this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    WRITE_STORAGE_PERMISSION_REQUEST_CODE);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
-    }
-
-    public boolean checkPermissionForReadExternalStorage() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int result = this.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
-            return result == PackageManager.PERMISSION_GRANTED;
-        }
-        return false;
-    }
-
-    public boolean checkPermissionForWriteExternalStorage() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int result = this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            return result == PackageManager.PERMISSION_GRANTED;
-        }
-        return false;
-    }
-
-    public static void setupBouncyCastle() {
-
-        final Provider provider = Security.getProvider(BouncyCastleProvider.PROVIDER_NAME);
-        if (provider == null) {
-            // Web3j will set up the provider lazily when it's first used.
-            return;
-        }
-        if (provider.getClass().equals(BouncyCastleProvider.class)) {
-            // BC with same package name, shouldn't happen in real life.
-            return;
-        }
-        // Android registers its own BC provider. As it might be outdated and might not include
-        // all needed ciphers, we substitute it with a known BC bundled in the app.
-        // Android's BC has its package rewritten to "com.android.org.bouncycastle" and because
-        // of that it's possible to have another BC implementation loaded in VM.
-        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
-        Security.insertProviderAt(new BouncyCastleProvider(), 1);
+        endAppTime = System.nanoTime();
     }
 
     private void loadViews() {
@@ -425,4 +348,92 @@ public class MainActivity extends Activity {
         }
 
     }
+
+        public void requestPermissionForReadExternalStorage() throws Exception {
+        try {
+            ActivityCompat.requestPermissions((Activity) this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    READ_STORAGE_PERMISSION_REQUEST_CODE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public void requestPermissionForWriteExternalStorage() throws Exception {
+        try {
+            ActivityCompat.requestPermissions((Activity) this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    WRITE_STORAGE_PERMISSION_REQUEST_CODE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public boolean checkPermissionForReadExternalStorage() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int result = this.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+            return result == PackageManager.PERMISSION_GRANTED;
+        }
+        return false;
+    }
+
+    public boolean checkPermissionForWriteExternalStorage() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int result = this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            return result == PackageManager.PERMISSION_GRANTED;
+        }
+        return false;
+    }
+
+    public static void setupBouncyCastle() {
+
+        final Provider provider = Security.getProvider(BouncyCastleProvider.PROVIDER_NAME);
+        if (provider == null) {
+            // Web3j will set up the provider lazily when it's first used.
+            return;
+        }
+        if (provider.getClass().equals(BouncyCastleProvider.class)) {
+            // BC with same package name, shouldn't happen in real life.
+            return;
+        }
+        // Android registers its own BC provider. As it might be outdated and might not include
+        // all needed ciphers, we substitute it with a known BC bundled in the app.
+        // Android's BC has its package rewritten to "com.android.org.bouncycastle" and because
+        // of that it's possible to have another BC implementation loaded in VM.
+        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
+        Security.insertProviderAt(new BouncyCastleProvider(), 1);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        float statusMemory;
+        float statusAppTime;
+        sum = Monitor.writeTimes("", "SUM");
+        statusMemory = endMemory - startMemory;
+        statusAppTime = endAppTime - startAppTime;
+         
+
+        if (sum > 15000000) {
+            System.out.println("[Monitor] Tempo de execução: O sistema preparou a build...");
+        }
+        else {
+        sum = sum/1000000;
+        statusAppTime = statusAppTime/1000000;
+        statusMemory = Math.abs(statusMemory/1000);
+        DecimalFormat df = new DecimalFormat("#.####");
+        DecimalFormat df2 = new DecimalFormat("#.####");
+        DecimalFormat df3 = new DecimalFormat("#.####");
+        String iString = df.format(sum);
+        String iString2 = df2.format(statusMemory);
+        String iString3 = df3.format(statusAppTime);
+        System.out.println("[Monitor] Tempo de execução (Total): " + iString3 + " ms\n");
+        System.out.println("[Monitor] Tempo de execução (Segurança): " + iString + " ms\n");
+        System.out.println("[Monitor] Memória: " + iString2 + " KB\n");
+        }
+
+        Monitor.writeTimes("", "CLEAN");
+    }
+
 }
